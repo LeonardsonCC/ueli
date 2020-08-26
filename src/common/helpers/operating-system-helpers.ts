@@ -6,6 +6,8 @@ export function getCurrentOperatingSystem(platform: string): OperatingSystem {
             return OperatingSystem.Windows;
         case "darwin":
             return OperatingSystem.macOS;
+        case "linux":
+            return OperatingSystem.linux;
         default:
             throw new Error(`Platform "${platform}" is not supported`);
     }
@@ -17,6 +19,8 @@ export function getOperatingSystemVersion(operatingSystem: OperatingSystem, oper
             return getMacOsVersion(operatingSystemRelease);
         case OperatingSystem.Windows:
             return getWindowsVersion(operatingSystemRelease);
+        case OperatingSystem.linux:
+            return getLinuxVersion(operatingSystemRelease);
     }
 }
 
@@ -49,9 +53,16 @@ function getMacOsVersion(operatingSystemRelease: string): OperatingSystemVersion
             return OperatingSystemVersion.MacOsMojave;
         case "19":
             return OperatingSystemVersion.MacOsCatalina;
-        case "20":
-            return OperatingSystemVersion.MacOsBigSur;
         default:
             throw new Error(`Unsupported macOS version: ${operatingSystemRelease}`);
+    }
+}
+
+function getLinuxVersion(operatingSystemRelease: string): OperatingSystemVersion {
+    switch (operatingSystemRelease) {
+        case "5.4.0-42-generic":
+            return OperatingSystemVersion.Linux;
+        default:
+            throw new Error(`Unsopported Linux version: ${operatingSystemRelease}`)
     }
 }

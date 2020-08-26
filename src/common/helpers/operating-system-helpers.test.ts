@@ -30,6 +30,19 @@ const invalidMacOsPlatformIdentifiers = [
     "shit",
 ];
 
+const linuxPlatformIdentifier = "linux";
+const invalidLinuxPlatformIdentifiers = [
+    "",
+    "  ",
+    "linx",
+    "ubuntu",
+    "centos",
+    "lin ux",
+    "linux_ubuntu",
+    "opensource_os",
+    "-",
+];
+
 describe(getCurrentOperatingSystem, () => {
     it(`it should return ${OperatingSystem.Windows} when passing in win32`, () => {
         expect(getCurrentOperatingSystem(windowsPlatformIdentifier)).toBe(OperatingSystem.Windows);
@@ -39,11 +52,14 @@ describe(getCurrentOperatingSystem, () => {
         expect(getCurrentOperatingSystem(macOsPlatformIdentifier)).toBe(OperatingSystem.macOS);
     })
 
+    it(`it should return ${OperatingSystem.linux} when passing in darwin`, () => {
+        expect(getCurrentOperatingSystem(linuxPlatformIdentifier)).toBe(OperatingSystem.linux);
+    })
+
     it("should throw an error when passing in an unsupported platform identifier", () => {
         let errorCounter = 0;
 
         const unsupportedPlatformIdentifiers = [
-            "linux",
             "freebsd",
             "openbsd",
             "sunos",
@@ -58,6 +74,10 @@ describe(getCurrentOperatingSystem, () => {
 
         invalidMacOsPlatformIdentifiers.forEach((invalidMacOsPlatformIdentifier) => {
             unsupportedPlatformIdentifiers.push(invalidMacOsPlatformIdentifier);
+        });
+
+        invalidLinuxPlatformIdentifiers.forEach((invalidLinuxPlatformIdentifier) => {
+            unsupportedPlatformIdentifiers.push(invalidLinuxPlatformIdentifier);
         });
 
         unsupportedPlatformIdentifiers.forEach((unsupportedPlatformIdentifier) => {
@@ -99,10 +119,6 @@ describe(getOperatingSystemVersion, () => {
                 kernelVersion: "19.x.x",
                 macOsVersion: OperatingSystemVersion.MacOsCatalina,
             },
-            {
-                kernelVersion: "20.x.x",
-                macOsVersion: OperatingSystemVersion.MacOsBigSur,
-            },
         ];
 
         versions.forEach((version) => {
@@ -121,8 +137,6 @@ describe(getOperatingSystemVersion, () => {
             "11",
             "12",
             "13",
-            "21",
-            "22",
         ];
 
         let errorCounter = 0;

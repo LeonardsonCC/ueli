@@ -1,7 +1,7 @@
 {
   "name": "ueli",
   "productName": "ueli",
-  "version": "8.8.2",
+  "version": "8.8.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,14 +16,16 @@
   "description": "This is a keystroke launcher for Windows and macOS.",
   "os": [
     "win32",
-    "darwin"
+    "darwin",
+    "linux"
   ],
   "keywords": [
     "keystroke",
     "launcher",
     "search",
     "Windows",
-    "macOS"
+    "macOS",
+    "linux"
   ],
   "main": "./bundle/main.js",
   "scripts": {

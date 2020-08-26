@@ -1,6 +1,7 @@
 export enum OperatingSystem {
     macOS = "macOS",
     Windows = "Windows",
+    linux = "linux",
 }
 
 export enum OperatingSystemVersion {
@@ -14,5 +15,5 @@ export enum OperatingSystemVersion {
     MacOsHighSierra = "High macOS 10.13 (Sierra)",
     MacOsMojave = "macOS 10.14 (Mojave)",
     MacOsCatalina = "macOS 10.15 (Catalina)",
-    MacOsBigSur = "macOS 11.0 (Big Sur)",
+    Linux = "5.4.0-42-generic",
 }
