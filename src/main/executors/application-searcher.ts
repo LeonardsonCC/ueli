@@ -2,7 +2,7 @@ import { normalize } from "path";
 import { ApplicationSearchOptions } from "../../common/config/application-search-options";
 import { executeCommandWithOutput } from "./command-executor";
 import { Logger } from "../../common/logger/logger";
-import { OperatingSystemVersion } from "../../common/operating-system";
+import { OperatingSystem, OperatingSystemVersion  } from "../../common/operating-system";
 
 export function searchWindowsApplications(
     applicationSearchOptions: ApplicationSearchOptions,
@@ -73,5 +73,44 @@ export function getMacOsApplicationSearcherCommand(macOsVersion: OperatingSystem
             return `mdfind "kind:apps"`;
         default:
             return "mdfind kMDItemContentTypeTree=com.apple.application-bundle";
+    }
+}
+
+export function searchLinuxApplications(
+    applicationSearchOptions: ApplicationSearchOptions,
+    logger: Logger,
+    linuxVersion: OperatingSystemVersion
+): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+        if (applicationSearchOptions.applicationFolders.length === 0) {
+            resolve([]);
+        } else {
+            applicationSearchOptions.applicationFolders.map((applicationFolder) => {
+
+                executeCommandWithOutput(`for app in ${applicationFolder}/*.desktop; do echo "\${app}"; done`)
+                    .then((data) => {
+                        const filePaths = data
+                            .split("\n")
+                            .map((f) => normalize(f).trim())
+                            .filter((f) => f.length > 2);
+
+                        resolve(filePaths);
+                    })
+                    .catch((err) => reject(err));
+            });
+        }
+    });
+}
+
+export function getApplicationsSearcher(operatingSystem: OperatingSystem) {
+    switch (operatingSystem) {
+        case OperatingSystem.Windows: 
+            return searchWindowsApplications;
+        case OperatingSystem.macOS:
+            return searchMacApplications;
+        case OperatingSystem.linux:
+            return searchLinuxApplications;
+        default:
+            throw new Error("Operating System not found!")
     }
 }

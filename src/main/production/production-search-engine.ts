@@ -4,7 +4,7 @@ import { UeliCommandSearchPlugin } from "../plugins/ueli-command-search-plugin/u
 import { ShortcutsSearchPlugin } from "../plugins/shortcuts-search-plugin/shortcuts-search-plugin";
 import { homedir } from "os";
 import { openUrlInBrowser } from "../executors/url-executor";
-import { executeFilePathWindows, executeFilePathMacOs } from "../executors/file-path-executor";
+import { getExecuteFilePath } from "../executors/file-path-executor";
 import { SearchEngine } from "../search-engine";
 import { EverythingPlugin } from "../plugins/everything-plugin/everthing-plugin";
 import { SearchPlugin } from "../search-plugin";
@@ -15,7 +15,7 @@ import { openFileLocation } from "../executors/file-path-location-executor";
 import { TranslationSet } from "../../common/translation/translation-set";
 import { WebSearchPlugin } from "../plugins/websearch-plugin/websearch-plugin";
 import { FileBrowserExecutionPlugin } from "../plugins/filebrowser-plugin/filebrowser-plugin";
-import { isValidWindowsFilePath, isValidMacOsFilePath } from "../../common/helpers/file-path-validators";
+import { getPathValidator } from "../../common/helpers/file-path-validators";
 import { getFileIconDataUrl } from "../../common/icon/generate-file-icon";
 import { OperatingSystemCommandsPlugin } from "../plugins/operating-system-commands-plugin/operating-system-commands-plugin";
 import { MacOsOperatingSystemCommandRepository } from "../plugins/operating-system-commands-plugin/mac-os-operating-system-command-repository";
@@ -29,21 +29,21 @@ import { CurrencyConverterPlugin } from "../plugins/currency-converter-plugin/cu
 import { executeCommand } from "../executors/command-executor";
 import { WorkflowPlugin } from "../plugins/workflow-plugin/workflow-plugin";
 import { CommandlinePlugin } from "../plugins/commandline-plugin/commandline-plugin";
-import { windowsCommandLineExecutor, macOsCommandLineExecutor } from "../executors/commandline-executor";
+import { getCommandlineExecutor } from "../executors/commandline-executor";
 import { OperatingSystemSettingsPlugin } from "../plugins/operating-system-settings-plugin/operating-system-settings-plugin";
 import { MacOsOperatingSystemSettingRepository } from "../plugins/operating-system-settings-plugin/macos-operating-system-setting-repository";
-import { executeWindowsOperatingSystemSetting, executeMacOSOperatingSystemSetting } from "../executors/operating-system-setting-executor";
+import { getOperatingSystemSettingExecutor } from "../executors/operating-system-setting-executor";
 import { WindowsOperatingSystemSettingRepository } from "../plugins/operating-system-settings-plugin/windows-operating-system-setting-repository";
 import { SimpleFolderSearchPlugin } from "../plugins/simple-folder-search-plugin/simple-folder-search-plugin";
 import { Logger } from "../../common/logger/logger";
 import { UwpPlugin } from "../plugins/uwp-plugin/uwp-plugin";
 import { ColorConverterPlugin } from "../plugins/color-converter-plugin/color-converter-plugin";
 import { ProductionApplicationRepository } from "../plugins/application-search-plugin/production-application-repository";
-import { defaultWindowsAppIcon, defaultMacOsAppIcon } from "../../common/icon/default-icons";
+import { getDefaultAppIcon } from "../../common/icon/default-icons";
 import { ApplicationIconService } from "../plugins/application-search-plugin/application-icon-service";
 import { generateWindowsAppIcons } from "../plugins/application-search-plugin/windows-app-icon-generator";
-import { windowsFileSearcher as powershellFileSearcher, macosFileSearcher } from "../executors/file-searchers";
-import { searchWindowsApplications, searchMacApplications } from "../executors/application-searcher";
+import { gettFileSearcher } from "../executors/file-searchers";
+import { getApplicationsSearcher } from "../executors/application-searcher";
 import { generateMacAppIcons } from "../plugins/application-search-plugin/mac-os-app-icon-generator";
 import { DictionaryPlugin } from "../plugins/dictionary-plugin/dictionary-plugin";
 import { BrowserBookmarksPlugin } from "../plugins/browser-bookmarks-plugin/browser-bookmarks-plugin";
@@ -63,25 +63,32 @@ export function getProductionSearchEngine(
     translationSet: TranslationSet,
     logger: Logger,
 ): SearchEngine {
-    const filePathValidator = operatingSystem === OperatingSystem.Windows ? isValidWindowsFilePath : isValidMacOsFilePath;
-    const filePathExecutor = operatingSystem === OperatingSystem.Windows ? executeFilePathWindows : executeFilePathMacOs;
+    const filePathValidator = getPathValidator(operatingSystem);
+    const filePathExecutor = getExecuteFilePath(operatingSystem);
     const filePathLocationExecutor = openFileLocation;
     const urlExecutor = openUrlInBrowser;
-    const commandlineExecutor = operatingSystem === OperatingSystem.Windows ? windowsCommandLineExecutor : macOsCommandLineExecutor;
-    const operatingSystemSettingsRepository = operatingSystem === OperatingSystem.Windows ? new WindowsOperatingSystemSettingRepository() : new MacOsOperatingSystemSettingRepository();
-    const operatingSystemSettingExecutor = operatingSystem === OperatingSystem.Windows ? executeWindowsOperatingSystemSetting : executeMacOSOperatingSystemSetting;
-    const applicationSearcher = operatingSystem === OperatingSystem.Windows ? searchWindowsApplications : searchMacApplications;
-    const appIconGenerator = operatingSystem === OperatingSystem.Windows ? generateWindowsAppIcons : generateMacAppIcons;
-    const defaultAppIcon = operatingSystem === OperatingSystem.Windows ? defaultWindowsAppIcon : defaultMacOsAppIcon;
-    const fileSearcher = operatingSystem === OperatingSystem.Windows ? powershellFileSearcher : macosFileSearcher;
-    const chromeBookmarksFilePath = operatingSystem === OperatingSystem.Windows
-        ? `${homedir()}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Bookmarks`
-        : `${homedir()}/Library/Application\ Support/Google/Chrome/Default/Bookmarks`;
-    const braveBookmarksFilePath = operatingSystem === OperatingSystem.Windows
-        ? `${homedir()}\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Bookmarks`
-        : `${homedir()}/Library/Application\ Support/BraveSoftware/Brave-Browser/Default/Bookmarks`;
+    const commandlineExecutor = getCommandlineExecutor(operatingSystem);
+    const operatingSystemSettingsRepository = operatingSystem === OperatingSystem.Windows ? new WindowsOperatingSystemSettingRepository() : new MacOsOperatingSystemSettingRepository(); // TODO: Add linux here
+    const operatingSystemSettingExecutor = getOperatingSystemSettingExecutor(operatingSystem);
+    const applicationSearcher = getApplicationsSearcher(operatingSystem);
+    const appIconGenerator = operatingSystem === OperatingSystem.Windows ? generateWindowsAppIcons : generateMacAppIcons; // TODO: Add linux here
+    const defaultAppIcon = getDefaultAppIcon(operatingSystem);
+    const fileSearcher = gettFileSearcher(operatingSystem);
 
-    const operatingSystemCommandRepository = operatingSystem === OperatingSystem.Windows
+    let chromeBookmarksFilePath;
+    let braveBookmarksFilePath;
+    if (operatingSystem === OperatingSystem.Windows) {
+        chromeBookmarksFilePath = `${homedir()}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Bookmarks`;
+        braveBookmarksFilePath = `${homedir()}\\AppData\\Local\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Bookmarks`;
+    } else if (operatingSystem === OperatingSystem.macOS) {
+        chromeBookmarksFilePath = `${homedir()}/Library/Application\ Support/Google/Chrome/Default/Bookmarks`
+        braveBookmarksFilePath = `${homedir()}/Library/Application\ Support/BraveSoftware/Brave-Browser/Default/Bookmarks`
+    } else {
+        chromeBookmarksFilePath = `${homedir()}/.config/google-chrome/Default`
+        braveBookmarksFilePath = `${homedir()}/.config/BraveSoftware/Brave-Browser/Default`
+    }
+
+    const operatingSystemCommandRepository = operatingSystem === OperatingSystem.Windows // TODO: Add linux here
         ? new WindowsOperatingSystemCommandRepository(translationSet)
         : new MacOsOperatingSystemCommandRepository(translationSet);
 

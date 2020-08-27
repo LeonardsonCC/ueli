@@ -1,5 +1,6 @@
 import { executeCommand } from "./command-executor";
-import { MacOsShell, WindowsShell } from "../plugins/commandline-plugin/shells";
+import { MacOsShell, WindowsShell, LinuxShell } from "../plugins/commandline-plugin/shells";
+import { OperatingSystem } from "../../common/operating-system";
 
 const unsupportedShellRejection = (shell: WindowsShell | MacOsShell) => {
     return Promise.reject(`Unsupported shell: ${shell.toString()}`);
@@ -57,3 +58,28 @@ export const windowsCommandLineExecutor = (command: string, shell: WindowsShell)
             return unsupportedShellRejection(shell);
     }
 };
+
+export const linuxCommandLineExecutor = (command: string, shell: LinuxShell): Promise<void> => {
+    switch (shell) {
+        case LinuxShell.Bash:
+            return executeCommand(`bash ${command}`);
+        case LinuxShell.Zsh:
+            return executeCommand(`zsh ${command}`);
+        default:
+            return unsupportedShellRejection(shell);
+    }
+};
+
+export function getCommandlineExecutor(operatingSystem: OperatingSystem) {
+    switch (operatingSystem) {
+        case OperatingSystem.Windows: 
+            return windowsCommandLineExecutor;
+        case OperatingSystem.macOS:
+            return macOsCommandLineExecutor;
+        case OperatingSystem.linux:
+            return linuxCommandLineExecutor;
+        default:
+            throw new Error("Operating System not found!")
+    }
+}
+

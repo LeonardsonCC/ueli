@@ -1,5 +1,6 @@
 import { executeCommand } from "./command-executor";
 import { shell } from "electron";
+import { OperatingSystem } from "../../common/operating-system";
 
 export function executeFilePathWindows(filePath: string, privileged: boolean): Promise<void> {
     return privileged
@@ -11,6 +12,25 @@ export function executeFilePathMacOs(filePath: string, privileged: boolean): Pro
     return privileged
         ? executeFilePathMacOsAsPrivileged(filePath)
         : openFile(filePath);
+}
+
+export function executeFilePathLinux(filePath: string, privileged: boolean): Promise<void> {
+    return privileged
+        ? executeFilePathLinuxAsPrivileged(filePath)
+        : openFile(filePath);
+}
+
+export function getExecuteFilePath(operatingSystem: OperatingSystem) {
+    switch (operatingSystem) {
+        case OperatingSystem.Windows: 
+            return executeFilePathWindows;
+        case OperatingSystem.macOS:
+            return executeFilePathMacOs;
+        case OperatingSystem.linux:
+            return executeFilePathLinux;
+        default:
+            throw new Error("Operating System not found!")
+    }
 }
 
 function openFile(filePath: string): Promise<void> {
@@ -30,4 +50,8 @@ function executeFilePathWindowsAsPrivileged(filePath: string): Promise<void> {
 
 function executeFilePathMacOsAsPrivileged(filePath: string): Promise<void> {
     return executeCommand(`osascript -e 'do shell script "open \\"${filePath}\\"" with administrator privileges'`);
+}
+
+function executeFilePathLinuxAsPrivileged(filePath: string): Promise<void> {
+    return executeCommand(`sudo xdg-open ${filePath}`);
 }

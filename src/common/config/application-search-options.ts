@@ -34,6 +34,29 @@ const macOsApplicationSearchOptions: ApplicationSearchOptions = {
     useNativeIcons: true,
 };
 
-export const defaultApplicationSearchOptions = getCurrentOperatingSystem(platform()) === OperatingSystem.Windows
-    ? windowsApplicationSearchOptions
-    : macOsApplicationSearchOptions;
+const linuxApplicationSearchOptions: ApplicationSearchOptions = {
+    applicationFileExtensions: [".desktop"],
+    applicationFolders: [
+        "/usr/share/applications",
+        `${homedir()}/local/share/applications`,
+    ],
+    enabled: true,
+    showFullFilePath: false,
+    useNativeIcons: true,
+};
+
+function getSearchOptions(currentOperatingSystem: OperatingSystem) {
+    switch (currentOperatingSystem) {
+        case OperatingSystem.Windows: 
+            return windowsApplicationSearchOptions; 
+        case OperatingSystem.macOS:
+            return macOsApplicationSearchOptions;
+        case OperatingSystem.linux:
+            return linuxApplicationSearchOptions;
+        default:
+            throw new Error("Operating system not found!");
+    }
+}
+
+export const defaultApplicationSearchOptions = 
+    getSearchOptions(getCurrentOperatingSystem(platform()));

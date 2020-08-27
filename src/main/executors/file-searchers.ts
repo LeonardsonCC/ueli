@@ -1,5 +1,6 @@
 import { executeCommandWithOutput } from "./command-executor";
 import { normalize } from "path";
+import { OperatingSystem } from "../../common/operating-system";
 
 export interface FileSearchOption {
     folderPath: string;
@@ -47,4 +48,32 @@ export function macosFileSearcher(option: FileSearchOption): Promise<string[]> {
             })
             .catch((err) => reject(err));
     });
+}
+
+export function linuxFileSearcher(option: FileSearchOption): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+        executeCommandWithOutput(`locate "${option.folderPath}" -i -l 1000 -p`)
+            .then((data) => {
+                const result = data
+                    .split("\n")
+                    .map((l) => normalize(l).trim())
+                    .filter((l) => l.length > 2);
+
+                resolve(result);
+            })
+            .catch((err) => reject(err));
+    });
+}
+
+export function gettFileSearcher(operatingSystem: OperatingSystem) {
+    switch (operatingSystem) {
+        case OperatingSystem.Windows: 
+            return windowsFileSearcher;
+        case OperatingSystem.macOS:
+            return macosFileSearcher;
+        case OperatingSystem.linux:
+            return linuxFileSearcher;
+        default:
+            throw new Error("Operating System not found!")
+    }
 }
