@@ -87,7 +87,7 @@ export function searchLinuxApplications(
         } else {
             applicationSearchOptions.applicationFolders.map((applicationFolder) => {
 
-                executeCommandWithOutput(`for app in ${applicationFolder}/*.desktop; do echo "\${app}"; done`)
+                executeCommandWithOutput(`ls -1a ${applicationFolder}`)
                     .then((data) => {
                         const filePaths = data
                             .split("\n")
@@ -96,7 +96,6 @@ export function searchLinuxApplications(
 
                         resolve(filePaths);
                     })
-                    .catch((err) => reject(err));
             });
         }
     });

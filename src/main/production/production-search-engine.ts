@@ -42,6 +42,7 @@ import { ProductionApplicationRepository } from "../plugins/application-search-p
 import { getDefaultAppIcon } from "../../common/icon/default-icons";
 import { ApplicationIconService } from "../plugins/application-search-plugin/application-icon-service";
 import { generateWindowsAppIcons } from "../plugins/application-search-plugin/windows-app-icon-generator";
+import { generateLinuxAppIcons } from "../plugins/application-search-plugin/linux-app-icon-generator";
 import { gettFileSearcher } from "../executors/file-searchers";
 import { getApplicationsSearcher } from "../executors/application-searcher";
 import { generateMacAppIcons } from "../plugins/application-search-plugin/mac-os-app-icon-generator";
@@ -71,7 +72,7 @@ export function getProductionSearchEngine(
     const operatingSystemSettingsRepository = operatingSystem === OperatingSystem.Windows ? new WindowsOperatingSystemSettingRepository() : new MacOsOperatingSystemSettingRepository(); // TODO: Add linux here
     const operatingSystemSettingExecutor = getOperatingSystemSettingExecutor(operatingSystem);
     const applicationSearcher = getApplicationsSearcher(operatingSystem);
-    const appIconGenerator = operatingSystem === OperatingSystem.Windows ? generateWindowsAppIcons : generateMacAppIcons; // TODO: Add linux here
+    const appIconGenerator = generateLinuxAppIcons; // TODO: Add linux here
     const defaultAppIcon = getDefaultAppIcon(operatingSystem);
     const fileSearcher = gettFileSearcher(operatingSystem);
 
