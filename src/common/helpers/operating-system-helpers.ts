@@ -59,10 +59,10 @@ function getMacOsVersion(operatingSystemRelease: string): OperatingSystemVersion
 }
 
 function getLinuxVersion(operatingSystemRelease: string): OperatingSystemVersion {
-    switch (operatingSystemRelease) {
-        case "5.4.0-42-generic":
-            return OperatingSystemVersion.Linux;
-        default:
-            throw new Error(`Unsopported Linux version: ${operatingSystemRelease}`)
+    if (operatingSystemRelease.startsWith("5.4.0")) {
+        return OperatingSystemVersion.Linux;
+    }
+    else {
+        throw new Error(`Unsupported macOS version: ${operatingSystemRelease}`);
     }
 }

@@ -2,8 +2,8 @@ import { homedir } from "os";
 import { join } from "path";
 import { FileHelpers } from "../../../common/helpers/file-helpers";
 import { applicationIconLocation, getApplicationIconFilePath } from "./application-icon-helpers";
-import { existsSync } from "fs";
-import { executeCommand, executeCommandWithOutput } from "../../executors/command-executor";
+//import { existsSync } from "fs";
+// import { executeCommand, executeCommandWithOutput } from "../../executors/command-executor";
 
 export function generateLinuxAppIcons(applicationFilePaths: string[]): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -17,7 +17,10 @@ export function generateLinuxAppIcons(applicationFilePaths: string[]): Promise<v
                     FileHelpers.createFolderSync(applicationIconLocation);
                 }
 
-                Promise.all (applicationFilePaths.map((application) => console.log(application))) // TODO: Retirar o console.log
+                Promise.all (applicationFilePaths.map((application) => {
+                    console.log("DEBUG: getApp, app", getApplicationIconFilePath(application), application)
+                    getIconFilePath(application)
+                })) // TODO: Retirar o console.log
                     .then(() => resolve())
                     .catch((err) => reject(err));
             })
@@ -25,21 +28,9 @@ export function generateLinuxAppIcons(applicationFilePaths: string[]): Promise<v
     });
 }
 
-//function generateLinuxAppIcon(applicationFilePath: string): Promise<void> {
-    //return new Promise((resolve, reject) => {
-        //// TODO: AQUI
-        //const iconFilePath = getIconFilePath(applicationFilePath); // Obter o path com o nome do icone
-        //const outPngFilePath = getApplicationIconFilePath(applicationFilePath);
-        //convertIcnsToPng(icnsFilePath, outPngFilePath)
-            //.then(() => resolve())
-            //.catch(() => convertIcnsToPng(defaultIcnsFilePath,outPngFilePath).then(()=> resolve).catch((err)=> reject(err)) );
-    //});
-//}
-
 function getIconFilePath(applicationDesktopFile: string): string {
     const defaultIconsPath = getIconsPath();
-
-   
+    console.log(applicationDesktopFile);
 
     return defaultIconsPath[0];
 }

@@ -62,9 +62,9 @@ export const windowsCommandLineExecutor = (command: string, shell: WindowsShell)
 export const linuxCommandLineExecutor = (command: string, shell: LinuxShell): Promise<void> => {
     switch (shell) {
         case LinuxShell.Bash:
-            return executeCommand(`bash ${command}`);
+            return executeCommand(`${command}`);
         case LinuxShell.Zsh:
-            return executeCommand(`zsh ${command}`);
+            return executeCommand(`${command}`);
         default:
             return unsupportedShellRejection(shell);
     }

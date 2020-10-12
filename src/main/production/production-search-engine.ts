@@ -41,11 +41,11 @@ import { ColorConverterPlugin } from "../plugins/color-converter-plugin/color-co
 import { ProductionApplicationRepository } from "../plugins/application-search-plugin/production-application-repository";
 import { getDefaultAppIcon } from "../../common/icon/default-icons";
 import { ApplicationIconService } from "../plugins/application-search-plugin/application-icon-service";
-import { generateWindowsAppIcons } from "../plugins/application-search-plugin/windows-app-icon-generator";
+// import { generateWindowsAppIcons } from "../plugins/application-search-plugin/windows-app-icon-generator";
 import { generateLinuxAppIcons } from "../plugins/application-search-plugin/linux-app-icon-generator";
 import { gettFileSearcher } from "../executors/file-searchers";
 import { getApplicationsSearcher } from "../executors/application-searcher";
-import { generateMacAppIcons } from "../plugins/application-search-plugin/mac-os-app-icon-generator";
+// import { generateMacAppIcons } from "../plugins/application-search-plugin/mac-os-app-icon-generator";
 import { DictionaryPlugin } from "../plugins/dictionary-plugin/dictionary-plugin";
 import { BrowserBookmarksPlugin } from "../plugins/browser-bookmarks-plugin/browser-bookmarks-plugin";
 import { GoogleChromeBookmarkRepository } from "../plugins/browser-bookmarks-plugin/google-chrome-bookmark-repository";

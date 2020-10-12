@@ -78,24 +78,29 @@ export function getMacOsApplicationSearcherCommand(macOsVersion: OperatingSystem
 
 export function searchLinuxApplications(
     applicationSearchOptions: ApplicationSearchOptions,
-    logger: Logger,
-    linuxVersion: OperatingSystemVersion
+    _: Logger,
+    __: OperatingSystemVersion
 ): Promise<string[]> {
     return new Promise((resolve, reject) => {
         if (applicationSearchOptions.applicationFolders.length === 0) {
             resolve([]);
         } else {
             applicationSearchOptions.applicationFolders.map((applicationFolder) => {
-
-                executeCommandWithOutput(`ls -1a ${applicationFolder}`)
+                executeCommandWithOutput(`ls -1 ${applicationFolder} | xargs -L1 -I '{}' grep 'Exec='${applicationFolder}/{}`)
                     .then((data) => {
-                        const filePaths = data
-                            .split("\n")
-                            .map((f) => normalize(f).trim())
-                            .filter((f) => f.length > 2);
+                        console.log("DATA: ", data);
+                        if (data.length > 0) {
+                            const filePaths = data
+                                .split("\n")
+                                .map((f) => normalize(f.split("=")[1]).trim())
+                                .filter((f) => f.length > 2);
 
-                        resolve(filePaths);
+                            resolve(filePaths);
+                        } else {
+                            resolve([]);
+                        }
                     })
+                    .catch(err => console.log(err));
             });
         }
     });
