@@ -86,14 +86,15 @@ export function searchLinuxApplications(
             resolve([]);
         } else {
             applicationSearchOptions.applicationFolders.map((applicationFolder) => {
-                executeCommandWithOutput(`ls -1 ${applicationFolder} | xargs -L1 -I '{}' grep 'Exec='${applicationFolder}/{}`)
+                executeCommandWithOutput(`for app in ${applicationFolder}/*.desktop; do grep "Exec=" "$\{app}"; done`)
                     .then((data) => {
-                        console.log("DATA: ", data);
                         if (data.length > 0) {
                             const filePaths = data
                                 .split("\n")
-                                .map((f) => normalize(f.split("=")[1]).trim())
-                                .filter((f) => f.length > 2);
+                                .map((f) => f.split("=")[1])
+                                .filter((f) => f !== undefined)
+                                .map((f) => f.split(" ")[0].trim())
+                                .filter((f) => f.length > 2)
 
                             resolve(filePaths);
                         } else {

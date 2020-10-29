@@ -17,7 +17,7 @@ export function executeFilePathMacOs(filePath: string, privileged: boolean): Pro
 export function executeFilePathLinux(filePath: string, privileged: boolean): Promise<void> {
     return privileged
         ? executeFilePathLinuxAsPrivileged(filePath)
-        : openFile(filePath);
+        : executeCommand(`${filePath}`)
 }
 
 export function getExecuteFilePath(operatingSystem: OperatingSystem) {
@@ -53,5 +53,5 @@ function executeFilePathMacOsAsPrivileged(filePath: string): Promise<void> {
 }
 
 function executeFilePathLinuxAsPrivileged(filePath: string): Promise<void> {
-    return executeCommand(`sudo xdg-open ${filePath}`);
+    return executeCommand(`gksu ${filePath}`);
 }

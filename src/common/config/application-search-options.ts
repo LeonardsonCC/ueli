@@ -38,7 +38,7 @@ const linuxApplicationSearchOptions: ApplicationSearchOptions = {
     applicationFileExtensions: [".desktop"],
     applicationFolders: [
         "/usr/share/applications",
-        `${homedir()}/local/share/applications`,
+      // `${homedir()}/local/share/applications`,
     ],
     enabled: true,
     showFullFilePath: false,
