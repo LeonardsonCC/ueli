@@ -89,12 +89,16 @@ export function searchLinuxApplications(
                 executeCommandWithOutput(`for app in ${applicationFolder}/*.desktop; do grep "Exec=" "$\{app}"; done`)
                     .then((data) => {
                         if (data.length > 0) {
-                            const filePaths = data
+                            let filePaths = data
                                 .split("\n")
                                 .map((f) => f.split("=")[1])
                                 .filter((f) => f !== undefined)
                                 .map((f) => f.split(" ")[0].trim())
                                 .filter((f) => f.length > 2)
+
+                            filePaths = filePaths.filter((f, index) => {
+                                return filePaths.indexOf(f) >= index;
+                            })
 
                             resolve(filePaths);
                         } else {
